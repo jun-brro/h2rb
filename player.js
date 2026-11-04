@@ -6,10 +6,12 @@ const visibleVideos = new Set();
 function refreshPlayback() {
   for (const group of videoGroups) {
     const paused = !group.videos.some(video => requestedPlayback.get(video));
-    group.toggle.setAttribute('aria-pressed', String(paused));
-    group.toggle.querySelector('span').textContent = paused ? 'Play videos' : 'Pause videos';
-    group.toggle.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} both ${group.element.dataset.viewerLabel} recordings`);
-    group.toggle.querySelector('path').setAttribute('d', paused ? 'M6 3 16 10 6 17Z' : 'M7 4v12M13 4v12');
+    if (group.toggle) {
+      group.toggle.setAttribute('aria-pressed', String(paused));
+      group.toggle.querySelector('span').textContent = paused ? 'Play videos' : 'Pause videos';
+      group.toggle.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} both ${group.element.dataset.viewerLabel} recordings`);
+      group.toggle.querySelector('path').setAttribute('d', paused ? 'M6 3 16 10 6 17Z' : 'M7 4v12M13 4v12');
+    }
     for (const video of group.videos) {
       if (!requestedPlayback.get(video) || !visibleVideos.has(video) || !video.getClientRects().length || document.hidden || video.error) video.pause();
       else if (video.paused) video.play().catch(error => {
@@ -60,7 +62,7 @@ function seekVideo(view, time) {
 }
 
 for (const group of videoGroups) {
-  group.toggle.addEventListener('click', () => {
+  group.toggle?.addEventListener('click', () => {
     const play = !group.videos.some(video => requestedPlayback.get(video));
     group.videos.forEach(video => {
       if (play && video.ended) video.currentTime = 0;
@@ -85,6 +87,37 @@ for (const group of videoGroups) {
     panel.innerHTML = `<div class="player-controls"><button class="player-play icon-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3 16 10 6 17Z"/></svg></button><input class="video-seek" type="range" min="0" max="1" step="0.01" value="0" aria-label="Seek ${role} recording"><output class="player-clock">00:00.0</output><button class="player-expand icon-button" type="button" aria-label="Expand ${role} recording"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m6 0h4v-4"/></svg></button></div>`;
     shell.after(panel);
     const view = { video, shell, surface, play: panel.querySelector('.player-play'), seek: panel.querySelector('.video-seek'), clock: panel.querySelector('.player-clock'), expand: panel.querySelector('.player-expand') };
+    if (!video.hasAttribute('muted')) {
+      const audio = document.createElement('div');
+      audio.className = 'player-audio';
+      audio.innerHTML = '<button class="player-mute icon-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path/></svg></button><input class="player-volume" type="range" min="0" max="1" step="0.05" value="1">';
+      view.expand.before(audio);
+      const mute = audio.querySelector('button');
+      const volume = audio.querySelector('input');
+      volume.setAttribute('aria-label', `Volume for ${role}`);
+      const initialVolume = video.volume;
+      try {
+        video.volume = .5;
+        volume.hidden = video.volume !== .5;
+        video.volume = initialVolume;
+      } catch { volume.hidden = true; }
+      const updateVolume = () => {
+        const silent = video.muted || video.volume === 0;
+        mute.setAttribute('aria-label', `${silent ? 'Unmute' : 'Mute'} ${role}`);
+        mute.setAttribute('aria-pressed', String(silent));
+        mute.querySelector('path').setAttribute('d', `M3 8h3l4-4v12l-4-4H3Z ${silent ? 'M13 7l5 6m0-6-5 6' : 'M13 7a4 4 0 0 1 0 6M15 4a8 8 0 0 1 0 12'}`);
+        volume.value = silent ? 0 : video.volume;
+        volume.setAttribute('aria-valuetext', `${Math.round(Number(volume.value) * 100)}%`);
+      };
+      mute.addEventListener('click', () => {
+        if (video.muted || video.volume === 0) { video.muted = false; if (video.volume === 0) video.volume = 1; }
+        else video.muted = true;
+        updateVolume();
+      });
+      volume.addEventListener('input', () => { video.volume = Number(volume.value); video.muted = video.volume === 0; updateVolume(); });
+      video.addEventListener('volumechange', updateVolume);
+      updateVolume();
+    }
     view.play.addEventListener('click', () => toggleVideo(video));
     surface.addEventListener('click', () => toggleVideo(video));
     view.seek.addEventListener('input', () => seekVideo(view, Number(view.seek.value)));
@@ -117,8 +150,8 @@ for (const group of videoGroups) {
       error.querySelector('a').href = video.getAttribute('src');
       refreshPlayback();
     });
-    video.defaultPlaybackRate = 3;
-    video.playbackRate = 3;
+    video.defaultPlaybackRate = Number(video.dataset.playbackRate) || 3;
+    video.playbackRate = video.defaultPlaybackRate;
     const updateRate = () => { figure.querySelector('.film-rate').textContent = `${video.playbackRate}×`; };
     video.addEventListener('ratechange', updateRate);
     updateRate();

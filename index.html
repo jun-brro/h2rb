@@ -19,10 +19,10 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=628ad6ba1c46">
+  <link rel="stylesheet" href="styles.css?v=60bbbe25dc9b">
   <script src="analytics.js?v=2ec099de5f2b" data-measurement-id="G-Z6TR1JBW81" data-hostname="junhyeong-park.me" data-base-path="/h2rb" defer></script>
   <script src="app.js?v=492f11f89a1e" defer></script>
-  <script src="player.js?v=a6461883143a" defer></script>
+  <script src="player.js?v=1ca6e2afabe6" defer></script>
   <script src="representations.js?v=dbaabd60c201" defer></script>
 </head>
 <body>
@@ -396,6 +396,20 @@
       <p class="figure-note reading" id="pca-status" role="status"></p>
       <p class="figure-note reading">PCA is a qualitative 2D view, read alongside the rollout results. Action-space panels use a separate PCA basis per tokenizer. Human I and II denote human object-transfer and skill-transfer data.</p>
     </section>
+    </section>
+
+    <section class="article-section shell summary-section" id="summary" aria-labelledby="summary-title">
+      <div class="reading">
+        <h2 id="summary-title">Summary video</h2>
+        <p id="summary-description">A narrated overview of H2RB, from unpaired human demonstrations to cross-embodiment transfer.</p>
+      </div>
+      <div class="summary-viewer" data-video-viewer data-autoplay="false" data-viewer-label="summary video" role="region" aria-labelledby="summary-title">
+        <figure class="summary-video">
+          <figcaption><span>English narration · 1:40</span><span class="film-rate">1×</span></figcaption>
+          <video id="summary-video" controls playsinline preload="none" data-playback-rate="1" poster="assets/media/summary-v6.jpg?v=4e6c5186ab8f" src="assets/media/summary-v6.mp4?v=4e6c5186ab8f" aria-label="H2RB summary video with English narration" aria-describedby="summary-description"></video>
+          <p class="media-error" hidden>Video could not load. <a href="assets/media/summary-v6.mp4?v=4e6c5186ab8f" download>Download the summary video</a>.</p>
+        </figure>
+      </div>
     </section>
 
     <section class="resources-section reading" id="paper" aria-labelledby="paper-title">
