@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="H2RB bridges representation and action spaces in vision-language-action models, transferring behaviors from human demonstrations to robots.">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:title" content="Human-to-Robot Transfer via Bridging Representation and Action Space in VLAs">
+  <meta property="og:description" content="CoRL 2026 Workshop · Scaling H2R · Oral Presentation">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://junhyeong-park.me/h2rb/">
+  <meta property="og:image" content="https://junhyeong-park.me/h2rb/assets/og-image.png">
+  <meta property="og:image:width" content="2400">
+  <meta property="og:image:height" content="1260">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://junhyeong-park.me/h2rb/assets/og-image.png">
+  <title>H2RB — Human-to-Robot Bridge</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=628ad6ba1c46">
+  <script src="analytics.js?v=2ec099de5f2b" data-measurement-id="G-Z6TR1JBW81" data-hostname="junhyeong-park.me" data-base-path="/h2rb" defer></script>
+  <script src="app.js?v=492f11f89a1e" defer></script>
+  <script src="player.js?v=a6461883143a" defer></script>
+  <script src="representations.js?v=dbaabd60c201" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="wordmark" href="#" aria-label="H2RB home">H2RB</a>
+    <nav aria-label="Main navigation">
+      <a href="#demonstrations">Demos</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#paper">Paper</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" aria-labelledby="page-title">
+      <h1 id="page-title"><span class="title-accent">H</span>uman-<span class="title-accent">t</span>o-<span class="title-accent">R</span>obot Transfer via <span class="title-accent">B</span>ridging<br class="desktop-break"> Representation and Action Space in VLAs</h1>
+      <div class="paper-meta">
+        <div class="author-block">
+          <p class="authors"><a href="https://junhyeong-park.me/" target="_blank" rel="noopener">Junhyeong Park<sup aria-label="KAIST">1</sup></a>, <a href="https://openreview.net/profile?id=~Wook_Jung1" target="_blank" rel="noopener">Wook Jung<sup aria-label="KAIST">1</sup></a>, <a href="https://ismty0805.github.io/" target="_blank" rel="noopener">Taeyoung Kim<sup aria-label="KAIST, RLWRLD">1,2</sup></a>, <a href="https://huiwon-jang.github.io/" target="_blank" rel="noopener">Huiwon Jang<sup aria-label="KAIST, RLWRLD">1,2</sup></a>, <a href="https://alinlab.kaist.ac.kr/shin.html" target="_blank" rel="noopener">Jinwoo Shin<sup aria-label="KAIST, RLWRLD; corresponding author">1,2,*</sup></a></p>
+          <p class="affiliations"><span><sup>1</sup> KAIST</span><span><sup>2</sup> RLWRLD</span><span><sup>*</sup> Corresponding author</span></p>
+        </div>
+        <p class="venue">CoRL 2026 Workshop<br> <span class="paper-recognition"><a href="https://scaling-h2r-corl.github.io/" target="_blank" rel="noopener">Scaling H2R</a> <span class="oral-recognition">Oral Presentation</span></span></p>
+      </div>
+      <div class="hero-summary">
+        <p class="hero-intro">Adapting pretrained VLAs with unpaired human and robot demonstrations.</p>
+        <div class="hero-resources" aria-label="Research resources">
+          <a class="paper-button" href="https://arxiv.org/abs/2611.04391" target="_blank" rel="noopener">arXiv</a>
+          <a class="paper-button" href="https://github.com/jun-brro/h2rb-code" target="_blank" rel="noopener">GitHub</a>
+          <a class="paper-button" href="assets/h2rb.bib" download>BibTeX <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v11m-4-4 4 4 4-4M3 14v4h14v-4"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase demo-section shell" id="demonstrations" aria-label="H2RB demonstrations">
+      <div class="showcase-row" id="openarm-viewer" data-video-viewer data-viewer-label="OpenArm demonstration" role="region" aria-label="Human-to-robot transfer on OpenArm">
+      <div class="viewer-toolbar">
+        <h2 class="embodiment-title">OpenArm</h2>
+        <div class="task-options" role="group" aria-label="Select a demonstration task">
+          <button type="button" data-task="open" aria-pressed="true">Open</button>
+          <button type="button" data-task="close" aria-pressed="false">Close</button>
+          <button type="button" data-task="box" aria-pressed="false">Box</button>
+          <button type="button" data-task="ball" aria-pressed="false">Ball</button>
+          <button type="button" data-task="towel" aria-pressed="false">Towel</button>
+        </div>
+        <button class="playback-control" id="playback-toggle" data-playback-toggle type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg><span>Pause videos</span></button>
+      </div>
+      <div class="film-pair">
+        <figure>
+          <figcaption><span>Human demonstration</span><span class="film-rate">1×</span></figcaption>
+          <video id="human-video" controls muted loop playsinline preload="metadata" poster="assets/media/human-open.jpg" aria-label="Human demonstration: open the air fryer" src="assets/media/human-open.mp4"></video>
+          <p class="media-error" id="human-error" hidden>Video could not load. <a href="assets/media/human-open.mp4" download>Download the human demonstration</a>.</p>
+        </figure>
+        <figure>
+          <figcaption><span>Robot execution</span><span class="film-rate">1×</span></figcaption>
+          <video id="robot-video" controls muted loop playsinline preload="metadata" poster="assets/media/robot-open.jpg" aria-label="Robot execution: open the air fryer" src="assets/media/robot-open.mp4"></video>
+          <p class="media-error" id="robot-error" hidden>Video could not load. <a href="assets/media/robot-open.mp4" download>Download the robot rollout</a>.</p>
+        </figure>
+      </div>
+      </div>
+      <div class="showcase-row rby1-viewer" id="rby1-highlights" data-video-viewer data-viewer-label="RB-Y1 highlight" role="region" aria-label="RB-Y1 adaptation: selected success and failure highlights">
+        <div class="viewer-toolbar">
+          <h2 class="embodiment-title">RB-Y1 <span>Robot-only adaptation</span></h2>
+          <div class="task-options" role="group" aria-label="Select a parcel highlight">
+            <button type="button" data-rby1-object="carton" aria-pressed="true">Carton</button>
+            <button type="button" data-rby1-object="polybag" aria-pressed="false">Polybag</button>
+            <span class="full-recording-option"><span aria-hidden="true">|</span><a class="text-link full-recording-link" href="#rby1-rollouts" aria-label="Full RB-Y1 recordings">Full record</a></span>
+          </div>
+          <button class="playback-control" data-playback-toggle type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg><span>Pause videos</span></button>
+        </div>
+        <div class="film-pair">
+          <figure>
+            <figcaption><span>Robot-only HT · Failure</span><span class="film-rate">1×</span></figcaption>
+            <video id="baseline-highlight-video" data-condition="robot-only" controls muted loop playsinline preload="metadata" poster="assets/media/rby1/carton-robot-only.jpg" aria-label="Robot-only HT: unsuccessful carton attempt" src="assets/media/rby1/carton-robot-only.mp4"></video>
+            <p class="media-error" hidden>Video could not load. <a href="assets/media/rby1/carton-robot-only.mp4" download>Download this recording</a>.</p>
+          </figure>
+          <figure>
+            <figcaption><span class="ours-value">H2RB · Success</span><span class="film-rate">1×</span></figcaption>
+            <video id="h2rb-highlight-video" data-condition="h2rb" controls muted loop playsinline preload="metadata" poster="assets/media/rby1/carton-h2rb.jpg" aria-label="H2RB geometry-aligned human–robot HT: successful carton delivery" src="assets/media/rby1/carton-h2rb.mp4"></video>
+            <p class="media-error" hidden>Video could not load. <a href="assets/media/rby1/carton-h2rb.mp4" download>Download this recording</a>.</p>
+          </figure>
+        </div>
+      </div>
+      <p class="media-footnote showcase-context">Independent recordings. RB-Y1 demos were recorded separately from the paper’s evaluation trials. Both policies use robot-only downstream fine-tuning; failure excerpts include operator clearing.</p>
+      <details class="showcase-details">
+        <summary>Demo details and recording conditions</summary>
+        <h3>OpenArm transfer</h3>
+      <div class="viewer-caption" aria-live="polite" aria-atomic="true">
+        <p id="task-description">“Open the air fryer.”</p>
+        <p id="task-note">Skill transfer · instruction-conditioned variant</p>
+      </div>
+      <p class="media-footnote">Independent recordings. <span id="video-speed-note" data-speed-note>Native playback at recorded speed.</span> Drag each timeline to explore the recording. Selected examples; aggregate evaluation is reported below.</p>
+      <noscript><p>Choose a recording: <a href="assets/media/robot-box.mp4">Box</a>, <a href="assets/media/robot-ball.mp4">Ball</a>, <a href="assets/media/robot-towel.mp4">Towel</a>, <a href="assets/media/robot-close.mp4">Close</a>. The paired Open videos above work without JavaScript.</p></noscript>
+        <h3>RB-Y1 adaptation</h3>
+        <div class="viewer-caption" aria-live="polite" aria-atomic="true">
+          <p data-parcel-description>Turn the shipping label upward, then deliver the parcel.</p>
+          <p data-parcel-outcome>The carton stalls with Robot-only HT; an operator clears it at the end. H2RB delivers it label-up.</p>
+        </div>
+        <p class="media-footnote">Both policies use robot-only downstream fine-tuning. H2RB adds human–robot HT with geometry alignment. Independent selected recordings; <span data-speed-note>native playback at recorded speed.</span></p>
+
+        <noscript><p>Polybag recordings: <a href="assets/media/rby1/polybag-robot-only.mp4">Robot-only HT</a> · <a href="assets/media/rby1/polybag-h2rb.mp4">H2RB</a>. The Carton videos above work without JavaScript.</p></noscript>
+      </details>
+    </section>
+
+    <section class="key-points shell" id="takeaways" aria-labelledby="takeaways-title">
+      <h2 id="takeaways-title">H2RB in three points</h2>
+      <ol>
+        <li><strong>Transfer human-demonstrated tasks to robots</strong> using pretrained VLAs, without target-robot demonstrations or paired human-robot trajectories.</li>
+        <li><strong>Bridge cross-embodiment perception and action gaps</strong> through hand geometry-anchored alignment and a decoupled-decoder latent tokenizer.</li>
+        <li><strong>Scale with heterogeneous human-robot training</strong> to improve human-to-robot task transfer and robot-only downstream adaptation.</li>
+      </ol>
+    </section>
+
+    <section class="article-section intro-section reading" aria-labelledby="intro-title">
+      <h2 id="intro-title">Abstract</h2>
+      <p>Robot demonstrations are expensive to collect. Human demonstrations are far easier to capture—but a human hand and a robot hand do not look or move the same way. Putting their actions in the same format only solves part of the problem.</p>
+      <p><strong>H2RB bridges both sides of that gap.</strong> It grounds a pretrained vision-language-action model’s representations in shared hand geometry, and learns a common action space with separate decoders for human and robot motion.</p>
+      <p>The result: a robot can learn target objects and interactions from human demonstrations, using prior robot experience to make those behaviors executable. <em>No paired human–robot trajectories or target-task robot demonstrations are needed for the OpenArm transfer settings.</em></p>
+    </section>
+
+    <section class="article-section shell method-section" id="method" aria-labelledby="method-title">
+      <div class="reading">
+        <h2 id="method-title">Method overview</h2>
+        <p>H2RB connects human and robot experience at two interfaces: the features that condition the policy, and the actions the policy predicts.</p>
+      </div>
+      <div class="method-toolbar">
+        <button id="method-toggle" class="playback-control" type="button" aria-pressed="false" aria-controls="method-perception method-actions" hidden>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg><span>Pause animation</span>
+        </button>
+      </div>
+      <div class="method-spread">
+        <figure>
+          <div class="method-canvas">
+            <div id="method-perception" class="method-graphic" data-source="assets/figures/pipeline_b.svg?v=65d76356074e" role="img" aria-label="Geometry-grounded VLA pipeline: human and robot observations enter a VLM, a residual adapter is supervised by shared hand geometry, and an action expert predicts shared latent actions.">
+              <img src="assets/figures/pipeline_b.png" width="1400" height="960" loading="lazy" alt="Geometry-grounded VLA pipeline: human and robot observations enter a VLM, a residual adapter is supervised by shared hand geometry, and an action expert predicts shared latent actions.">
+            </div>
+          </div>
+          <figcaption><h3>Ground perception in geometry</h3><p>A shared residual adapter learns wrist pose and fingertip geometry from each observation. Human and robot features become more compatible without paired demonstrations.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="method-canvas">
+            <div id="method-actions" class="method-graphic" data-source="assets/figures/pipeline_a.svg?v=e2c71fdf7623" role="img" aria-label="A shared temporal encoder maps human and robot actions to latent actions, while separate human and robot decoders reconstruct their source-specific motion.">
+              <img src="assets/figures/pipeline_a.png" width="900" height="1100" loading="lazy" alt="A shared temporal encoder maps human and robot actions to latent actions, while separate human and robot decoders reconstruct their source-specific motion.">
+            </div>
+          </div>
+          <figcaption><h3>Share actions, preserve dynamics</h3><p>A shared encoder learns compatible action latents. Separate decoders retain the motion structure of each source instead of forcing both through a single action mapping.</p></figcaption>
+        </figure>
+      </div>
+      <details class="method-detail reading">
+        <summary>How does deployment work?</summary>
+        <p>The policy takes robot observations, proprioceptive state and a language instruction. Its action expert generates latent actions, which the human-trained decoder maps into the shared, robot-compatible wrist–hand representation. Inverse normalization, coordinate mapping and inverse kinematics produce robot commands. The shared encoder and latent-action policy have learned from both sources; selecting the human decoder does not make the policy human-only.</p>
+      </details>
+    </section>
+
+
+
+    <section class="article-section shell setup-section" id="setup" aria-labelledby="setup-title">
+      <div class="reading">
+        <h2 id="setup-title">Robot and evaluation setup</h2>
+        <p>OpenArm evaluates human-to-robot object and skill transfer with Inspire dexterous hands, a head-mounted stereo camera and 20 Hz rollouts. RB-Y1 tests robot-only fine-tuning on parcel-handling tasks.</p>
+      </div>
+      <fieldset class="setup-selector">
+        <legend class="visually-hidden">Robot platform</legend>
+        <input class="visually-hidden" type="radio" id="platform-openarm" name="robot-platform" value="openarm" aria-controls="setup-openarm" checked>
+        <input class="visually-hidden" type="radio" id="platform-rby1" name="robot-platform" value="rby1" aria-controls="setup-rby1">
+        <div class="setup-controls">
+          <label for="platform-openarm">OpenArm</label>
+          <label for="platform-rby1">RB-Y1</label>
+        </div>
+        <div class="setup-panel" id="setup-openarm" role="region" aria-label="OpenArm setup">
+          <div class="setup-grid">
+            <figure><div class="setup-media"><img src="assets/figures/robot_new.png" width="638" height="802" loading="lazy" alt="Original Appendix photograph of OpenArm with a head-mounted stereo camera and Inspire dexterous hand."></div><figcaption><h3>OpenArm platform</h3><p>The right arm and Inspire hand execute at 20 Hz. The policy uses right-camera RGB, a language instruction and a 15D wrist–hand state.</p></figcaption></figure>
+            <figure><div class="setup-media"><img src="assets/figures/placement.png" width="1375" height="752" loading="lazy" alt="Original Appendix diagram of four in-distribution placement quadrants and the surrounding out-of-distribution region beside the destination container."></div><figcaption><h3>Evaluation placements</h3><p>Each target object has 20 in-distribution trials—five per quadrant—and 10 outside that region. Object orientation is randomized.</p></figcaption></figure>
+          </div>
+        </div>
+        <div class="setup-panel" id="setup-rby1" role="region" aria-label="RB-Y1 setup">
+          <div class="setup-grid">
+            <figure><div class="setup-media"><img src="assets/figures/rby1_robot.png" width="965" height="744" loading="lazy" alt="Final Appendix hardware photograph of the RB-Y1 bimanual robot with two Wuji Hand 2 dexterous hands and a head-mounted ZED Mini stereo camera."></div><figcaption><h3>RB-Y1 platform</h3><p>Two 7-DoF arms and two 20-DoF Wuji Hand 2 hands. The policy uses both ZED Mini RGB views and a 58D wrist–hand state.</p></figcaption></figure>
+            <figure><div class="setup-media"><img src="assets/figures/rby1_parcel.png" width="835" height="744" loading="lazy" alt="Original Appendix photograph of boxes and polybags used in the RB-Y1 parcel-handling evaluation."></div><figcaption><h3>Evaluation objects</h3><p>Ten boxes and polybags, each repeated five times: 50 trials per policy. Success requires placing the parcel on the conveyor with its shipping label facing up.</p></figcaption></figure>
+          </div>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="article-section results-section" id="results" aria-labelledby="results-title">
+      <div class="reading">
+        <h2 id="results-title">Human-to-robot transfer</h2>
+        <p>On OpenArm with Inspire hands, H2RB transfers pick-and-place to new objects and learns to open and close an air fryer—interactions absent from the source robot demonstrations.</p>
+      </div>
+      <div class="results-figure shell">
+        <div class="results-toolbar">
+          <div class="result-options" role="group" aria-label="Select evaluation setting">
+            <button type="button" data-result="object" aria-pressed="true">Object transfer</button>
+            <button type="button" data-result="skill" aria-pressed="false">Skill transfer</button>
+            <button type="button" data-result="ood" aria-pressed="false">Placement shift</button>
+          </div>
+          <span class="metric-label">Weighted task score / 100</span>
+        </div>
+        <div class="chart-heading"><h3 id="chart-title">New objects, a familiar skill</h3><p id="chart-description">Box, ball and towel. Target-object demonstrations come from humans.</p></div>
+        <div id="result-chart" class="bar-chart" role="img" aria-label="Object transfer: base policy co-train 8.0, shared action with HaWoR 10.7, shared action with Ego-Pi 27.2, H2RB 51.8.">
+          <div class="bar-row"><span class="bar-label">Base policy co-train</span><div class="bar-track"><span class="bar" style="--value:8"></span></div><span class="bar-value">8.0</span></div>
+          <div class="bar-row"><span class="bar-label">+ HaWoR shared action</span><div class="bar-track"><span class="bar" style="--value:10.7"></span></div><span class="bar-value">10.7</span></div>
+          <div class="bar-row"><span class="bar-label">+ Ego-Pi shared action</span><div class="bar-track"><span class="bar" style="--value:27.2"></span></div><span class="bar-value">27.2</span></div>
+          <div class="bar-row ours"><span class="bar-label">+ H2RB</span><div class="bar-track"><span class="bar" style="--value:51.8"></span></div><span class="bar-value">51.8</span></div>
+        </div>
+        <p class="result-takeaway" id="result-takeaway">H2RB improves average object-transfer score from 8.0 to 51.8.</p>
+        <p class="figure-note">OpenArm values measure execution progress on a 0–100 scale; they are not binary success percentages. Values are transcribed from the manuscript’s main tables.</p>
+        <div class="training-datasets" id="training-datasets" data-video-viewer data-autoplay="false" data-viewer-label="training demonstration" role="region" aria-labelledby="training-datasets-title">
+          <div class="viewer-toolbar training-heading">
+            <div><h3 id="training-datasets-title">Dataset combination</h3><p>Independent, unpaired training examples for the selected transfer setting.</p></div>
+            <button class="playback-control" data-playback-toggle type="button" aria-pressed="true"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3 16 10 6 17Z"/></svg><span>Play videos</span></button>
+          </div>
+          <div class="training-grid">
+            <div class="training-column" data-training-domain="human">
+              <h4>Human</h4>
+              <div class="task-options" role="group" aria-label="Select a human training task">
+                <button type="button" data-training-task="box" aria-pressed="true">Box</button>
+                <button type="button" data-training-task="ball" aria-pressed="false">Ball</button>
+                <button type="button" data-training-task="towel" aria-pressed="false">Towel</button>
+              </div>
+              <figure>
+                <figcaption><span data-training-description aria-live="polite">Box pick-and-place</span><span class="film-rate">1×</span></figcaption>
+                <video id="training-human-video" controls muted loop playsinline preload="none" poster="assets/media/human-box.jpg" src="assets/media/human-box.mp4" aria-label="Human training demonstration: box pick-and-place"></video>
+                <p class="media-error" hidden>Video could not load. <a href="assets/media/human-box.mp4" download>Download this training example</a>.</p>
+              </figure>
+            </div>
+            <div class="training-column" data-training-domain="robot">
+              <h4>Robot</h4>
+              <div class="task-options" role="group" aria-label="Select a robot training task">
+                <button type="button" data-training-task="bottle" aria-pressed="true">Bottle</button>
+                <button type="button" data-training-task="cup" aria-pressed="false">Cup</button>
+                <button type="button" data-training-task="doll" aria-pressed="false">Doll</button>
+                <button type="button" data-training-task="snack" aria-pressed="false">Snack</button>
+              </div>
+              <figure>
+                <figcaption><span data-training-description aria-live="polite">Bottle pick-and-place</span><span class="film-rate">1×</span></figcaption>
+                <video id="training-robot-video" controls muted loop playsinline preload="none" poster="assets/media/training/object-robot-bottle.jpg?v=1121965880c1" src="assets/media/training/object-robot-bottle.mp4?v=1121965880c1" aria-label="Robot training demonstration: bottle pick-and-place"></video>
+                <p class="media-error" hidden>Video could not load. <a href="assets/media/training/object-robot-bottle.mp4?v=1121965880c1" download>Download this training example</a>.</p>
+              </figure>
+            </div>
+          </div>
+          <p class="media-footnote">One representative demonstration per task. Human videos introduce the target tasks; robot demonstrations provide training on other tasks. <span data-speed-note>Native playback at recorded speed.</span></p>
+          <noscript><p>Other object-transfer training examples: Human <a href="assets/media/human-ball.mp4">Ball</a>, <a href="assets/media/human-towel.mp4">Towel</a>; Robot <a href="assets/media/training/object-robot-cup.mp4?v=e2b09493ed71">Cup</a>, <a href="assets/media/training/object-robot-doll.mp4?v=5e8ba9c83297">Doll</a>, <a href="assets/media/training/object-robot-snack.mp4?v=15a1ddf4608d">Snack</a>.</p><p>Skill-transfer training examples: Human <a href="assets/media/human-open.mp4">Open</a>, <a href="assets/media/human-close.mp4">Close</a>; Robot <a href="assets/media/training/skill-robot-box.mp4?v=53d2246a6623">Box</a>, <a href="assets/media/training/skill-robot-ball.mp4?v=f39bcaf2d4bb">Ball</a>, <a href="assets/media/training/skill-robot-towel.mp4?v=9f0840a1d453">Towel</a>.</p></noscript>
+        </div>
+        <details class="result-table">
+          <summary>View all baseline scores and evaluation details</summary>
+          <p class="table-hint">Scroll horizontally to see all columns.</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Full manuscript results; scroll horizontally on narrow screens">
+            <table>
+              <caption>OpenArm transfer · weighted task scores (0–100)</caption>
+              <thead><tr><th scope="col">Method</th><th scope="col">Object · all</th><th scope="col">Object · ID</th><th scope="col">Object · OOD</th><th scope="col">Open</th><th scope="col">Close</th><th scope="col">Skill · avg.</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Human-only</th><td>29.1</td><td>33.7</td><td>20.0</td><td>36.0</td><td>22.0</td><td>29.0</td></tr>
+                <tr><th scope="row">In-domain-only</th><td>12.0</td><td>14.0</td><td>8.0</td><td>0.0</td><td>0.0</td><td>0.0</td></tr>
+                <tr><th scope="row">Base policy co-train</th><td>8.0</td><td>9.0</td><td>6.0</td><td>0.0</td><td>0.0</td><td>0.0</td></tr>
+                <tr><th scope="row">+ HaWoR shared action</th><td>10.7</td><td>10.0</td><td>12.0</td><td>0.0</td><td>0.0</td><td>0.0</td></tr>
+                <tr><th scope="row">+ Ego-Pi shared action</th><td>27.2</td><td>30.2</td><td>21.3</td><td>0.0</td><td>0.0</td><td>0.0</td></tr>
+                <tr class="ours"><th scope="row">+ H2RB</th><td>51.8</td><td>55.0</td><td>45.3</td><td>50.7</td><td>74.7</td><td>62.7</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Object transfer uses 20 in-distribution and 10 placement-shift rollouts per target object. Robot in-domain tasks are evaluated separately. Full task protocols and score weights are described in the manuscript appendix.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="article-section reading" aria-labelledby="scaling-title">
+      <h2 id="scaling-title">Scaling with heterogeneous experience</h2>
+      <p>The same principle extends to heterogeneous human–robot training across multiple embodiments, followed by task-specific fine-tuning.</p>
+      <p class="table-hint">Scroll horizontally to see all columns.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Effect of heterogeneous training">
+        <table class="scaling-table">
+          <caption>OpenArm · weighted task score (0–100)</caption>
+          <thead><tr><th scope="col">Training</th><th scope="col">Object transfer</th><th scope="col">Skill transfer</th></tr></thead>
+          <tbody><tr><th scope="row">H2RB</th><td>51.8</td><td>62.7</td></tr><tr class="ours"><th scope="row">+ Heterogeneous training</th><td>57.2</td><td>81.7</td></tr></tbody>
+        </table>
+      </div>
+      <p>Separately, stronger instruction conditioning raises the skill-transfer score from <strong>62.7 to 83.3</strong>. This is a distinct experiment from heterogeneous training; the two gains are not combined.</p>
+    </section>
+
+    <section class="robot-section shell" aria-labelledby="rby-title">
+      <figure class="ht-mixture" id="ht-mixture" aria-labelledby="ht-mixture-title">
+        <figcaption id="ht-mixture-title">Heterogeneous training data</figcaption>
+        <div class="ht-mixture-layout">
+          <svg class="ht-donut" viewBox="0 0 300 300" role="img" aria-label="HT episode composition: Human 12,993, Robot 1,555, total 14,548.">
+            <path data-ht-domain="human" d="M150.00000,24.00000 A126,126 0 1 1 71.59841,51.36334 L93.99887,79.54524 A90,90 0 1 0 150.00000,60.00000 Z" fill="var(--accent)"/>
+            <path data-ht-domain="robot" d="M71.59841,51.36334 A126,126 0 0 1 150.00000,24.00000 L150.00000,60.00000 A90,90 0 0 0 93.99887,79.54524 Z" fill="var(--muted)"/>
+            <text x="150" y="148" class="ht-total" text-anchor="middle">14,548</text><text x="150" y="172" class="ht-unit" text-anchor="middle">episodes</text>
+          </svg>
+          <div class="ht-legend">
+            <button type="button" data-ht-domain="human" aria-label="Human: 12,993 episodes, 89.3 percent. Show source breakdown." aria-describedby="ht-human-tooltip"><i class="ht-human-key" aria-hidden="true"></i><span>Human<strong>12,993 <small>89.3%</small></strong></span></button>
+            <button type="button" data-ht-domain="robot" aria-label="Robot: 1,555 episodes, 10.7 percent. Show source breakdown." aria-describedby="ht-robot-tooltip"><i class="ht-robot-key" aria-hidden="true"></i><span>Robot<strong>1,555 <small>10.7%</small></strong></span></button>
+          </div>
+        </div>
+        <div class="ht-tooltip" id="ht-human-tooltip" role="tooltip" hidden><strong>Human demonstrations</strong><dl><div><dt>EgoDex</dt><dd>10,000</dd></div><div><dt>In-house human</dt><dd>2,410</dd></div><div><dt>OpenArm human</dt><dd>583</dd></div></dl></div>
+        <div class="ht-tooltip" id="ht-robot-tooltip" role="tooltip" hidden><strong>Robot demonstrations</strong><dl><div><dt>OpenArm · single hand</dt><dd>452</dd></div><div><dt>OpenArm · bimanual</dt><dd>623</dd></div><div><dt>ALLEX</dt><dd>480</dd></div></dl></div>
+        <p class="figure-note">Episode composition of the reported HT dataset. Hover or tap a domain for its sources.</p>
+        <noscript><p class="figure-note">Human: EgoDex 10,000 + in-house 2,410 + OpenArm 583. Robot: single-hand OpenArm 452 + bimanual OpenArm 623 + ALLEX 480.</p></noscript>
+      </figure>
+      <div><h2 id="rby-title">Cross-embodiment adaptation</h2><p>On RB-Y1, geometry-grounded heterogeneous training also benefits robot-only downstream adaptation.</p><p>Parcel-handling success reaches <strong class="ours-value">78%</strong>, compared with 72% for human–robot heterogeneous training without geometry grounding and 64% for robot-only training.</p><p class="figure-note">Binary success over 50 trials. All variants use robot-only downstream fine-tuning, without the shared action tokenizer.</p></div>
+      <div class="demo-section rby1-viewer" id="rby1-rollouts" data-video-viewer data-autoplay="false" data-viewer-label="full RB-Y1 rollout" role="region" aria-labelledby="rby1-rollouts-title">
+        <h3 id="rby1-rollouts-title">RB-Y1 parcel-handling rollouts</h3>
+        <p class="rby1-demo-note">Demonstration runs, recorded separately from the paper’s quantitative evaluation.</p>
+        <div class="viewer-toolbar">
+          <div class="task-options" role="group" aria-label="Select a full recording set">
+            <button type="button" data-rby1-recording="01" aria-pressed="true">Recording 1</button>
+            <button type="button" data-rby1-recording="02" aria-pressed="false">Recording 2</button>
+          </div>
+          <button class="playback-control" data-playback-toggle type="button" aria-pressed="true"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3 16 10 6 17Z"/></svg><span>Play videos</span></button>
+        </div>
+        <div class="film-pair">
+          <figure>
+            <figcaption><span>Robot-only HT</span><span class="film-rate">1×</span></figcaption>
+            <video id="baseline-full-video" data-condition="robot-only" controls muted playsinline preload="none" poster="assets/media/rby1/robot-only-01-full.jpg" aria-label="Robot-only HT: full RB-Y1 recording 1" src="assets/media/rby1/robot-only-01-full.mp4"></video>
+            <p class="media-error" hidden>Video could not load. <a href="assets/media/rby1/robot-only-01-full.mp4" download>Download this recording</a>.</p>
+          </figure>
+          <figure>
+            <figcaption><span class="ours-value">H2RB · Human + Robot HT</span><span class="film-rate">1×</span></figcaption>
+            <video id="h2rb-full-video" data-condition="h2rb" controls muted playsinline preload="none" poster="assets/media/rby1/h2rb-01-full.jpg" aria-label="H2RB geometry-aligned human–robot HT: full RB-Y1 recording 1" src="assets/media/rby1/h2rb-01-full.mp4"></video>
+            <p class="media-error" hidden>Video could not load. <a href="assets/media/rby1/h2rb-01-full.mp4" download>Download this recording</a>.</p>
+          </figure>
+        </div>
+        <p class="media-footnote">Complete independent recordings, including operator loading and clearing. Success requires label-up orientation and conveyor delivery. These recordings illustrate behavior; the 78% result above comes from all 50 evaluation trials. <span data-speed-note>Native playback at recorded speed.</span></p>
+        <noscript><p>Recording 2: <a href="assets/media/rby1/robot-only-02-full.mp4">Robot-only HT</a> · <a href="assets/media/rby1/h2rb-02-full.mp4">H2RB</a>. Recording 1 has native controls above.</p></noscript>
+      </div>
+    </section>
+
+    <section class="article-section shell analysis-section" aria-labelledby="analysis-title">
+      <div class="reading">
+      <h2 id="analysis-title">Analysis and ablations</h2>
+      <p>A shared action format alone does not guarantee shared knowledge. In the manuscript’s ablation, adding the latent tokenizer enables skill transfer; cross-domain regularization strengthens it further.</p>
+      <p class="table-hint">Scroll horizontally to see all columns.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Action tokenizer ablation">
+        <table>
+          <caption>Action tokenizer ablation · geometry-anchored conditioning</caption>
+          <thead><tr><th scope="col">Action representation</th><th scope="col">Object</th><th scope="col">Skill</th><th scope="col">Latent gap</th></tr></thead>
+          <tbody><tr><th scope="row">Without tokenizer</th><td>34.7</td><td>0.0</td><td>—</td></tr><tr><th scope="row">Tokenizer</th><td>43.3</td><td>49.7</td><td>3.81</td></tr><tr class="ours"><th scope="row">+ Cross-domain regularization</th><td>51.8</td><td>62.7</td><td>1.53</td></tr></tbody>
+        </table>
+      </div>
+      <p>The normalized latent gap contracts from 3.81 to 1.53. Separate decoders preserve source-specific action dynamics: the human-transferred policy reaches a mean wrist speed of <strong>7.36 cm/s</strong> versus 2.52 cm/s for the robot-only policy, with task scores of 62.7 and 65.3 respectively.</p>
+      <details><summary>Where do existing approaches fail?</summary><p>Human-only policies can reproduce an interaction pattern yet miss a valid grasp. Robot-only policies have executable motion but lack the target behavior. Shared-action baselines can still predict invalid grasp poses or revert to a familiar pick-and-place motion instead of opening. These observed failures motivate aligning perception and action together.</p><p>Reconstruction, retargeting and scene-relative errors remain practical limits. A smaller latent gap or a successful selected clip alone is insufficient evidence of reliable transfer.</p></details>
+
+      </div>
+    <section class="pca-section" id="representations" aria-labelledby="representation-title">
+      <div class="reading">
+        <h3 id="representation-title">Bridging the representation gap</h3>
+        <p>Compare hand geometry alignment with H2RB in the conditioning space, or inspect the effect of regularization on action latents.</p>
+      </div>
+      <div class="pca-toolbar">
+        <div class="result-options" role="group" aria-label="Select a representation space">
+          <button type="button" data-projection="conditioning" aria-pressed="true">Conditioning features</button>
+          <button type="button" data-projection="action" aria-pressed="false">Action latents</button>
+        </div>
+        <div class="pca-controls" hidden>
+          <label><input type="checkbox" data-domain="robot" checked><i style="--domain:#2867b2"></i>Robot</label>
+          <label><input type="checkbox" data-domain="human1" checked><i style="--domain:#e45756"></i><span id="human-domain-label">Human</span></label>
+          <label id="human2-filter" hidden><input type="checkbox" data-domain="human2" checked><i style="--domain:#16884a"></i>Human II</label>
+        </div>
+      </div>
+      <div class="pca-grid">
+        <figure>
+          <h3 id="pca-left-title">Hand geometry alignment only</h3>
+          <div class="pca-viewport"><div class="pca-canvas" id="pca-left"><img src="assets/figures/cog_A.png" width="1056" height="857" loading="lazy" alt="Original geometry-only conditioning PCA. Blue robot and red human distributions with adapter-induced shifts."></div></div>
+        </figure>
+        <figure id="pca-right-figure">
+          <h3 id="pca-right-title">H2RB</h3>
+          <div class="pca-viewport"><div class="pca-canvas" id="pca-right"><img src="assets/figures/cog_AB.png" width="1056" height="857" loading="lazy" alt="Original H2RB conditioning PCA with robot and human distributions and adapter-induced shifts."></div></div>
+        </figure>
+      </div>
+      <p class="pca-description reading" id="pca-description">Hand geometry alignment alone (left) and H2RB (right). Arrows show adapter-induced shifts for the same observation. These original manuscript projections retain their points, axes and colors.</p>
+      <p class="figure-note reading" id="pca-status" role="status"></p>
+      <p class="figure-note reading">PCA is a qualitative 2D view, read alongside the rollout results. Action-space panels use a separate PCA basis per tokenizer. Human I and II denote human object-transfer and skill-transfer data.</p>
+    </section>
+    </section>
+
+    <section class="resources-section reading" id="paper" aria-labelledby="paper-title">
+      <h2 id="paper-title">Paper and citation</h2>
+      <p>Human-to-Robot Transfer via Bridging Representation and Action Space in VLAs</p>
+      <div class="resource-links">
+        <a class="text-link" href="https://arxiv.org/abs/2611.04391" target="_blank" rel="noopener">arXiv</a>
+        <a class="text-link" href="https://github.com/jun-brro/h2rb-code" target="_blank" rel="noopener">GitHub</a>
+        <a class="text-link" href="assets/h2rb.bib" download>Download BibTeX <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v11m-4-4 4 4 4-4M3 14v4h14v-4"/></svg></a>
+      </div>
+      <pre class="citation"><code>@misc{park2026humantorobottransferbridgingrepresentation,
+      title={Human-to-Robot Transfer via Bridging Representation and Action Space in VLAs}, 
+      author={Junhyeong Park and Wook Jung and Taeyoung Kim and Huiwon Jang and Jinwoo Shin},
+      year={2026},
+      eprint={2611.04391},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2611.04391}, 
+}</code></pre>
+    </section>
+  </main>
+  <footer class="site-footer shell"><a class="wordmark" href="#">H2RB</a><p>CoRL 2026 Workshop · <span class="paper-recognition"><a href="https://scaling-h2r-corl.github.io/" target="_blank" rel="noopener">Scaling H2R</a> <span class="oral-recognition">Oral Presentation</span></span></p><a href="#main">Back to top <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 17V3m-5 5 5-5 5 5"/></svg></a></footer>
+</body>
+</html>
